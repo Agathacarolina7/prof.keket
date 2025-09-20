@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="id">
 <head>
@@ -264,19 +265,29 @@ function draw(){
   if (bgImg.complete) ctx.drawImage(bgImg,0,0,canvas.width,canvas.height);
   else {ctx.fillStyle="#071225"; ctx.fillRect(0,0,canvas.width,canvas.height);}
 
-  // apel
-  if(fruit){
-    if(appleImg.complete){
-      ctx.shadowBlur=15; ctx.shadowColor="#ff4d4d";
-      ctx.drawImage(appleImg,fruit.x*grid,fruit.y*grid,grid,grid);
-      ctx.shadowBlur=0;
-    } else {
-      ctx.fillStyle="#ff5c5c";
-      ctx.beginPath();
-      ctx.arc(fruit.x*grid+grid/2,fruit.y*grid+grid/2,grid/2-2,0,Math.PI*2);
-      ctx.fill();
-    }
-  }
+ // apel
+if (fruit) {
+  let appleSize = grid * 1.7; // bikin apel lebih besar
+
+if (appleImg.complete) {
+  ctx.shadowBlur = 15;
+  ctx.shadowColor = "#90ee90";
+
+  let appleW = grid * 2.2; // lebar apel
+  let aspect = appleImg.height / appleImg.width;
+  let appleH = appleW * aspect; // tinggi sesuai rasio asli
+
+  ctx.drawImage(
+    appleImg,
+    fruit.x * grid + (grid - appleW) / 2,
+    fruit.y * grid + (grid - appleH) / 2,
+    appleW,
+    appleH
+  );
+
+  ctx.shadowBlur = 0;
+}
+}
 
   // ulat
   snake.forEach((s,i)=>{
@@ -287,7 +298,7 @@ if (dir.x === 0 && dir.y === -1) angle = 0;             // atas
 if (dir.x === 1 && dir.y === 0) angle = Math.PI / 2;    // kanan
 if (dir.x === 0 && dir.y === 1) angle = Math.PI;        // bawah
 if (dir.x === -1 && dir.y === 0) angle = -Math.PI / 2;  // kiri
-      let headSize = grid * 2; // kepala lebih besar dari badan
+      let headSize = grid * 4; // kepala lebih besar dari badan
 
       ctx.save();
       ctx.translate(s.x * grid + grid / 2, s.y * grid + grid / 2);
@@ -305,14 +316,24 @@ if (dir.x === -1 && dir.y === 0) angle = -Math.PI / 2;  // kiri
 
       ctx.restore();
    } else {
-    // ==== BADAN ====
-    if (bodyImg.complete) {
-      ctx.drawImage(bodyImg, s.x * grid, s.y * grid, grid, grid);
-    } else {
-      ctx.fillStyle = "limegreen";
-      ctx.fillRect(s.x * grid, s.y * grid, grid - 2, grid - 2);
+      // ==== BADAN ====
+      let bodySize = grid * 2;
+
+      if (bodyImg.complete) {
+        ctx.drawImage(
+          bodyImg,
+          s.x * grid + (grid - bodySize) / 2,
+          s.y * grid + (grid - bodySize) / 2,
+          bodySize,
+          bodySize
+        );
+      } else {
+        ctx.fillStyle = "limegreen";
+        ctx.beginPath();
+        ctx.arc(s.x * grid + grid / 2, s.y * grid + grid / 2, bodySize / 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
-  }
 });
 }
 
