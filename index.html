@@ -178,9 +178,11 @@ const qStatus=document.getElementById('questionStatus');
 const appleImg = new Image();
 appleImg.src = "apel.png";
 const headImg = new Image();
-headImg.src = "kepala_ular.png";
+headImg.src = "kepala_ulat.png";
 const bgImg = new Image();
 bgImg.src = "background.jpg";
+const bodyImg = new Image();
+bodyImg.src = "badan_ulat.png"; // file PNG transparan segmen badan ulat
 
 // ====== Bank soal IPS ======
 const allQuestions=[
@@ -278,24 +280,40 @@ function draw(){
 
   // ulat
   snake.forEach((s,i)=>{
-    if(i===0){ // kepala
-      if(headImg.complete){
-        ctx.shadowBlur=15; ctx.shadowColor="#9ae6b4";
-        ctx.drawImage(headImg,s.x*grid,s.y*grid,grid,grid);
-        ctx.shadowBlur=0;
+     if (i === 0) {
+      // === KEPALA ===
+     let angle = Math.PI / 0; // offset karena default gambar hadap ke bawah
+if (dir.x === 0 && dir.y === -1) angle = 0;             // atas
+if (dir.x === 1 && dir.y === 0) angle = Math.PI / 2;    // kanan
+if (dir.x === 0 && dir.y === 1) angle = Math.PI;        // bawah
+if (dir.x === -1 && dir.y === 0) angle = -Math.PI / 2;  // kiri
+      let headSize = grid * 2; // kepala lebih besar dari badan
+
+      ctx.save();
+      ctx.translate(s.x * grid + grid / 2, s.y * grid + grid / 2);
+      ctx.rotate(angle);
+
+      if (headImg && headImg.complete) {
+        ctx.drawImage(headImg, -headSize / 2, -headSize / 2, headSize, headSize);
       } else {
-        ctx.fillStyle="#9ae6b4";
-        ctx.shadowBlur=10; ctx.shadowColor="#9ae6b4";
-        ctx.fillRect(s.x*grid+1,s.y*grid+1,grid-2,grid-2);
-        ctx.shadowBlur=0;
+        // fallback lingkaran hijau
+        ctx.fillStyle = "green";
+        ctx.beginPath();
+        ctx.arc(0, 0, headSize / 2, 0, Math.PI * 2);
+        ctx.fill();
       }
-    } else { // badan
-      ctx.fillStyle="#16a34a";
-      ctx.shadowBlur=8; ctx.shadowColor="#16a34a";
-      ctx.fillRect(s.x*grid+1,s.y*grid+1,grid-2,grid-2);
-      ctx.shadowBlur=0;
+
+      ctx.restore();
+   } else {
+    // ==== BADAN ====
+    if (bodyImg.complete) {
+      ctx.drawImage(bodyImg, s.x * grid, s.y * grid, grid, grid);
+    } else {
+      ctx.fillStyle = "limegreen";
+      ctx.fillRect(s.x * grid, s.y * grid, grid - 2, grid - 2);
     }
-  });
+  }
+});
 }
 
 // ====== Game loop & soal ======
@@ -508,7 +526,21 @@ function bindArrowControls() {
 bindArrowControls();
 
 </script>
+
+<!-- Lagu Pengiring -->
+<audio id="bgMusic" src="musik kepompong.mp3" loop autoplay></audio>
+
+<script>
+  // Usahakan musik langsung jalan, tapi beberapa browser butuh interaksi user dulu
+  const bgMusic = document.getElementById("bgMusic");
+  bgMusic.volume = 0.3; // biar ga terlalu keras
+
+  // Kalau autoplay diblokir browser, jalanin setelah klik "Mulai"
+  document.addEventListener("click", () => {
+    if (bgMusic.paused) bgMusic.play();
+  });
+</script>
+
 </body>
 </html>
-
 
