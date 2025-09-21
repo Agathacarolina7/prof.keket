@@ -171,6 +171,7 @@ let currentFrame = 0;
 let typingInterval = null;
 let isTyping = false;
 let musicStarted = false;
+let finishedTyping = false; // <--- tambahan
 
 const stage = document.getElementById('stage');
 const slideImage = document.getElementById('slideImage');
@@ -201,32 +202,40 @@ function renderSlide() {
   startTyping(frame.text);
 }
 
-/* typing effect */
 function startTyping(text) {
   clearInterval(typingInterval);
   dialogueEl.innerText = '';
   let i = 0;
   isTyping = true;
+  finishedTyping = false; // reset setiap mulai ngetik
   typingInterval = setInterval(() => {
     if (i >= text.length) {
       clearInterval(typingInterval);
       isTyping = false;
+      finishedTyping = true; // tandai sudah selesai
       return;
     }
     dialogueEl.innerText += text[i];
     i++;
   }, 40);
 }
-
 /* ---------- next handler ---------- */
 function handleStageClick() {
+  // kalau masih ngetik → langsung tampil full
   if (isTyping) {
     clearInterval(typingInterval);
     const frame = slides[currentSlide].frames[currentFrame];
     dialogueEl.innerText = frame.text;
     isTyping = false;
+    finishedTyping = true; // tandai selesai
     return;
   }
+
+  // kalau teks belum selesai → jangan lanjut dulu
+  if (!finishedTyping) {
+    return;
+  }
+
 
   // Klik pertama di cover → masuk ke slide 1 + musik mulai
   if (currentSlide === 0) {
