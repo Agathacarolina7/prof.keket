@@ -381,50 +381,59 @@ if (appleImg.complete) {
 }
 
   // ulat
-  snake.forEach((s,i)=>{
-     if (i === 0) {
+  // ulat
+snake.forEach((s,i)=>{
+   if (i === 0) {
       // === KEPALA ===
-     let angle = 0; // offset karena default gambar hadap ke bawah
-if (dir.x === 0 && dir.y === -1) angle = 0;             // atas
-if (dir.x === 1 && dir.y === 0) angle = Math.PI / 2;    // kanan
-if (dir.x === 0 && dir.y === 1) angle = Math.PI;        // bawah
-if (dir.x === -1 && dir.y === 0) angle = -Math.PI / 2;  // kiri
-      let headSize = grid * 2; // kepala lebih besar dari badan
+      let angle = 0; // offset default
+      if (dir.x === 0 && dir.y === -1) angle = 0;          // atas
+      if (dir.x === 1 && dir.y === 0) angle = Math.PI / 2; // kanan
+      if (dir.x === 0 && dir.y === 1) angle = Math.PI;     // bawah
+      if (dir.x === -1 && dir.y === 0) angle = -Math.PI / 2; // kiri
+      let headSize = grid * 2;
 
       ctx.save();
-      ctx.translate(s.x * grid + grid / 2, s.y * grid + grid / 2);
+      ctx.translate(s.x * grid + grid/2, s.y * grid + grid/2);
       ctx.rotate(angle);
-
-      if (headImg && headImg.complete) {
-        ctx.drawImage(headImg, -headSize / 2, -headSize / 2, headSize, headSize);
+      if(headImg.complete){
+        ctx.drawImage(headImg, -headSize/2, -headSize/2, headSize, headSize);
       } else {
-        // fallback lingkaran hijau
         ctx.fillStyle = "green";
         ctx.beginPath();
-        ctx.arc(0, 0, headSize / 2, 0, Math.PI * 2);
+        ctx.arc(0,0, headSize/2,0,Math.PI*2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+   } else {
+      // ==== BADAN ====
+      let bodySize = grid * 2;
+      ctx.save();
+      ctx.translate(s.x * grid + grid/2, s.y * grid + grid/2);
+      
+      // hitung sudut badan: ambil arah dari badan sebelumnya ke badan sekarang
+      let prev = snake[i-1];
+      let dx = s.x - prev.x;
+      let dy = s.y - prev.y;
+      let angle = 0;
+      if(dx === 1) angle = Math.PI/2;      // kanan
+      if(dx === -1) angle = -Math.PI/2;    // kiri
+      if(dy === 1) angle = Math.PI;        // bawah
+      if(dy === -1) angle = 0;             // atas
+
+      ctx.rotate(angle);
+
+      if(bodyImg.complete){
+        ctx.drawImage(bodyImg, -bodySize/2, -bodySize/2, bodySize, bodySize);
+      } else {
+        ctx.fillStyle = "limegreen";
+        ctx.beginPath();
+        ctx.arc(0,0, bodySize/2,0,Math.PI*2);
         ctx.fill();
       }
 
       ctx.restore();
-   } else {
-      // ==== BADAN ====
-      let bodySize = grid * 2;
-
-      if (bodyImg.complete) {
-        ctx.drawImage(
-          bodyImg,
-          s.x * grid + (grid - bodySize) / 2,
-          s.y * grid + (grid - bodySize) / 2,
-          bodySize,
-          bodySize
-        );
-      } else {
-        ctx.fillStyle = "limegreen";
-        ctx.beginPath();
-        ctx.arc(s.x * grid + grid / 2, s.y * grid + grid / 2, bodySize / 2, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
+   }
 });
 }
 
