@@ -296,36 +296,7 @@ const allQuestions=[
    options:["Bertemu teman di kelas","Bercakap-cakap langsung di pasar","Menghubungi guru melalui telepon","Bermain sepak bola bersama"],correct:2},
   {q:"Interaksi sosial yang bersifat asosiatif adalah ...",
    options:["Kerja sama","Kompetisi","Pertentangan","Konflik"],correct:0},
-  {q:"Yang termasuk interaksi sosial disosiatif adalah ...",
-   options:["Akomodasi","Kompetisi","Kerja sama","Asimilasi"],correct:1},
-  {q:"Unsur sejarah yang utama adalah ...",
-   options:["Manusia, waktu, dan ruang","Gaya bahasa, estetika, dan seni","Pakaian, makanan, dan rumah","Ideologi, politik, dan ekonomi"],correct:0},
-  {q:"Letak astronomis Indonesia adalah ...",
-   options:["95° BT – 141° BT dan 6° LU – 11° LS","10° BT – 90° BT dan 10° LU – 10° LS","100° BT – 130° BT dan 5° LU – 5° LS","120° BT – 160° BT dan 20° LU – 20° LS"],correct:0},
-  {q:"Komponen utama peta adalah ...",
-   options:["Judul, skala, legenda, simbol, dan gratikul","Judul, warna, harga, dan keterangan","Legenda, gaya bahasa, ilustrasi, dan gambar","Judul, paragraf, teks, dan catatan"],correct:0},
-  {q:"Bentuk interaksi antarwilayah dapat berupa ...",
-   options:["Mobilitas penduduk, perdagangan, transportasi, dan komunikasi","Pertentangan, konflik, dan persaingan","Pertanian, perikanan, dan pertambangan","Pakaian adat, rumah adat, dan makanan tradisional"],correct:0},
-  {q:"Jika jarak pada peta 5 cm mewakili 5 km jarak sebenarnya, maka skala peta tersebut adalah ...",
-   options:["1 : 100.000","1 : 50.000","1 : 500.000","1 : 25.000"],correct:0},
-  {q:"Ibu kota provinsi Kalimantan Tengah adalah ...",
-   options:["Samarinda","Palangka Raya","Pontianak","Tarakan"],correct:1},
-  {q:"Pemerintah membangun jalan tol Trans-Jawa yang menghubungkan berbagai kota besar. Dampak interaksi antarwilayah di bidang transportasi tersebut adalah ...",
-   options:["Meningkatkan kelancaran distribusi barang dan mobilitas penduduk","Membatasi pergerakan masyarakat antar daerah","Mengurangi kerja sama antarwilayah karena akses semakin mudah","Menyebabkan berkurangnya aktivitas perdagangan antarwilayah"],correct:0},
-  {q:"Yang termasuk kebutuhan tersier adalah ...",
-   options:["Makanan pokok seperti nasi dan sayur","Rumah tempat tinggal sederhana","Mobil mewah dan perhiasan emas","Pakaian sehari-hari"],correct:2},
-  {q:"Menabung untuk biaya pendidikan anak termasuk contoh ...",
-   options:["Kebutuhan sekarang","Kebutuhan yang akan datang","Kebutuhan primer","Kebutuhan tersier"],correct:1},
-  {q:"Di suatu daerah harga bensin naik secara signifikan. Dampak yang kemungkinan terjadi terhadap penjualan sepeda motor adalah ...",
-   options:["Penjualan sepeda motor meningkat karena masyarakat ingin lebih cepat","Penjualan sepeda motor menurun karena biaya operasional bertambah","Penjualan sepeda motor tetap sama karena tidak ada kaitan dengan bensin","Penjualan sepeda motor naik turun secara acak tanpa pengaruh bensin"],correct:1},
-  {q:"Yang termasuk norma kesusilaan adalah ...",
-   options:["Tidak menyontek saat ujian","Tidak membuang sampah sembarangan","Menghormati bendera saat upacara","Membayar pajak tepat waktu"],correct:0},
-  {q:"Benda peninggalan sejarah berupa artefak adalah ...",
-   options:["Cerita rakyat tentang asal-usul suatu daerah","Prasasti dan peralatan dari logam","Kebiasaan masyarakat dalam upacara adat","Peristiwa penting yang diceritakan ulang"],correct:1},
-  {q:"Yang termasuk sumber sejarah tertulis adalah ...",
-   options:["Tradisi lisan yang diceritakan turun-temurun","Sisa bangunan candi dan arca","Naskah kuno dan dokumen perjanjian","Alat rumah tangga dari zaman prasejarah"],correct:2},
-  {q:"Zona Ekonomi Eksklusif (ZEE) Indonesia ditetapkan sejauh ...",
-   options:["12 mil laut dari garis pangkal","200 mil laut dari garis pangkal","100 mil laut dari garis pangkal","350 mil laut dari garis pangkal"],correct:1}
+ 
 ];
 
 function shuffle(array) {
@@ -547,9 +518,9 @@ function showQuestion(){
 }
 function answer(i){
   if(i===currentQ.correct){
-    qStatus.textContent="Benar! +10 poin"; correctCount++;
+    qStatus.textContent="Benar! +40 poin"; correctCount++;
     for(let j=0;j<3;j++){let t=snake[snake.length-1];snake.push({x:t.x,y:t.y});}
-    score+=10; placeFruit();
+    score+=40; placeFruit();
   } else { 
   qStatus.textContent="Jawaban salah, ulat anda sakit 🐛🤒 (melemah 10 detik)"; 
   wrongCount++; 
@@ -788,6 +759,7 @@ function goToLevel2() {
 
 </body>
 </html>
+
 
 
 
