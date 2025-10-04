@@ -316,7 +316,13 @@ function resetGame(){
   score=0;baseSpeed=4;lastMoveTime=0;isRunning=true;showingQuestion=false;slowUntil=0;
   correctCount=0; wrongCount=0;
   placeFruit();updateHUD();requestAnimationFrame(loop);
+
+  // tampilkan kontrol panah lagi
+  const controls = document.querySelector(".controls");
+  if (controls) controls.style.display = "flex";
 }
+
+
 function updateHUD(){scoreEl.textContent=score;lengthEl.textContent=snake.length;
   speedLabel.textContent=(Date.now()<slowUntil?"Melemah":"Normal");}
 function placeFruit(){
@@ -468,36 +474,40 @@ function getRandomQ(){
       <p style="text-align:center;margin-top:12px;font-size:18px;">Skor akhir: ${score}</p>
       <p style="text-align:center;">Jawaban benar: ${correctCount}</p>
       <p style="text-align:center;">Jawaban salah: ${wrongCount}</p>`;
-    
+
+    // === Sembunyikan kontrol panah setelah skor akhir muncul ===
+    const controls = document.querySelector(".controls");
+    if (controls) controls.style.display = "none";
+
     optsContainer.innerHTML = `
-  <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-    <button onclick="modal.style.display='none'; resetGame();" class="opt">Main Lagi</button>
-    <button id="nextLevelBtn" class="opt">Next Level ➡️</button>
-  </div>
-`;
+      <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <button onclick="modal.style.display='none'; resetGame();" class="opt">Main Lagi</button>
+        <button id="nextLevelBtn" class="opt">Next Level ➡️</button>
+      </div>
+    `;
 
-// logika tombol Next Level
-const nextBtn = document.getElementById("nextLevelBtn");
-if (score >= 150) {
-  nextBtn.onclick = () => { 
-    // mulai musik kepompong
-    const kepompongMusic = new Audio("musik kepompong.mp3");
-    kepompongMusic.play().catch(err => console.log("Autoplay kepompong diblokir:", err));
+    // logika tombol Next Level
+    const nextBtn = document.getElementById("nextLevelBtn");
+    if (score >= 150) {
+      nextBtn.onclick = () => { 
+        // mulai musik kepompong
+        const kepompongMusic = new Audio("musik kepompong.mp3");
+        kepompongMusic.play().catch(err => console.log("Autoplay kepompong diblokir:", err));
 
-    // lanjut ke video & overlay pipit
-    showVictory(); 
-  };
-} else {
-  nextBtn.disabled = true;
-  nextBtn.style.opacity = "0.5";
-  nextBtn.style.cursor = "not-allowed";
-}
-
+        // lanjut ke video & overlay pipit
+        showVictory(); 
+      };
+    } else {
+      nextBtn.disabled = true;
+      nextBtn.style.opacity = "0.5";
+      nextBtn.style.cursor = "not-allowed";
+    }
 
     qStatus.textContent=""; 
     modal.style.display="flex"; 
-    return null;
+    return; // cukup return aja
   }
+
   const idx=Math.floor(Math.random()*questionPool.length);
   const q=questionPool[idx]; 
   questionPool.splice(idx,1); 
@@ -759,6 +769,7 @@ function goToLevel2() {
 
 </body>
 </html>
+
 
 
 
