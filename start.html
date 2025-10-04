@@ -1,4 +1,4 @@
-ini kodingan saya: 
+
 <!doctype html>
 <html lang="id">
 <head>
@@ -173,7 +173,6 @@ canvas {
   </style>
 </head>
 <body>
-<button onclick="document.getElementById('pipitImage').style.display='block'">Tes Pipit</button>
 
 <!-- Kontrol panah virtual -->
 
@@ -209,7 +208,7 @@ canvas {
         <li>Salah = ulat melemah 10 detik</li>
       </ul>
 <div style="text-align:center; margin-top:10px;">
-  <img src="ulat_guru_transparent.jpg" alt="Ulat Guru" style="width:70%;border-radius:8px;">
+  <img src="ulat_guru_transparent.png" alt="Ulat Guru" style="width:70%;border-radius:8px;">
 </div>
     </div>
   </div>
@@ -737,7 +736,8 @@ bindArrowControls();
      style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); 
             z-index:9998;"></div>
 
-
+<!-- Musik kepompong, di HTML -->
+<audio id="cocoonMusic" src="kepompong.mp3" preload="auto"></audio>
 
 <script>
 function showVictory() {
@@ -787,6 +787,4 @@ function goToLevel2() {
 
 </body>
 </html>
-
-
 
