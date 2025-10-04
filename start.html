@@ -479,13 +479,15 @@ function getRandomQ(){
     const controls = document.querySelector(".controls");
     if (controls) controls.style.display = "none";
      optsContainer.innerHTML = `
-  <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; align-items:center;">
+  <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
     <button onclick="modal.style.display='none'; resetGame();" class="opt">Main Lagi</button>
-    <button id="nextLevelBtn" class="opt">Next Level ➡️</button>
     <button id="shareBtn" class="opt">
-      <img src="images/whatsapp.png" alt="Bagikan ke WhatsApp" style="width:30px; vertical-align:middle; margin-right:6px;">
+      <img src="images/whatsapp.png" alt="WhatsApp" style="width:20px; vertical-align:middle; margin-right:6px;">
       WhatsApp
     </button>
+  </div>
+  <div style="display:flex; justify-content:center; margin-top:8px;">
+    <button id="nextLevelBtn" class="opt">Next Level ➡️</button>
   </div>
 `;
 
@@ -771,7 +773,7 @@ document.addEventListener("click", () => {
   const shareBtn = document.getElementById("shareBtn");
   if (!shareBtn) return; // jika tombol belum ada, skip
   shareBtn.onclick = () => {
-    const message = `Aku bermain Ulat Guru! 🐛\nSkor akhir: ${score}\nJawaban benar: ${correctCount}\nJawaban salah: ${wrongCount}\nCoba main juga: https://alamat-game-anda.com`;
+    const message = `Aku bermain Ulat Keket! 🐛\nSkor akhir: ${score}\nJawaban benar: ${correctCount}\nJawaban salah: ${wrongCount}\nCoba main juga: "https://agathacarolina7.github.io/prof.keket/"`;
     const url = "https://wa.me/?text=" + encodeURIComponent(message);
     window.open(url, "_blank");
   };
