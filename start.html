@@ -461,6 +461,11 @@ function loop(ts){
 function gameOver(){
   isRunning=false; showingQuestion=false;
   document.getElementById("gameoverSound").play();
+
+  // sembunyikan kontrol panah saat Game Over
+  const controls = document.querySelector(".controls");
+  if (controls) controls.style.display = "none";
+
   qText.innerHTML=`
     <h2 style="text-align:center;margin:0;">Game Over</h2>
     <p style="text-align:center;">Skor akhir: ${score}</p>
@@ -468,8 +473,10 @@ function gameOver(){
     <p style="text-align:center;">Jawaban salah: ${wrongCount}</p>
   `;
   optsContainer.innerHTML='<button onclick="modal.style.display=\'none\';resetGame();" class="opt">Mulai Lagi</button>';
-  qStatus.textContent=""; modal.style.display="flex";
+  qStatus.textContent=""; 
+  modal.style.display="flex";
 }
+
 function getFinalMessage(score){
   if(score>=150) return '<h2 class="blink" style="text-align:center;font-size:24px;color:#4ade80;margin:0;">ULAT ANDA SEHAT ✅<br><span style="font-size:18px;">Anda majikan ulat yang baik</span></h2>';
   else if(score>=120) return '<h2 class="blink" style="text-align:center;font-size:24px;color:#facc15;margin:0;">ULAT ANDA KURANG GIZI 🍌</h2>';
