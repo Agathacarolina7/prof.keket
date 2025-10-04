@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <title>Level 2 - Kepompong Diserang Pipit</title>
+  <style>
+    body {
+      margin: 0;
+      background: #e0f7fa;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    #gameArea {
+      position: relative;
+      display: inline-block;
+    }
+    canvas {
+      background: #cce5ff;
+      display: block;
+      border: 3px solid #333;
+      border-radius: 10px;
+    }
+    #bird {
+      position: absolute;
+      top: 100px;
+      left: 650px;
+      width: 160px;
+      height: auto;
+      transform: scaleX(-1);
+      transition: left 0.8s ease;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: #00796b;
+      color: white;
+    }
+    button:hover {
+      background: #004d40;
+    }
+    #questionPanel {
+      margin-top: 15px;
+      display: none;
+    }
+    #questionText {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    #answerInput {
+      padding: 5px;
+      font-size: 16px;
+      width: 250px;
+      text-align: center;
+    }
+    /* Tambahan feedback benar/salah */
+    #feedback {
+      margin-top: 10px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .benar { color: lime; }
+    .salah { color: red; }
+  </style>
+</head>
+<body>
+  <h2>Level 2: Lindungi Kepompong dari Pipit</h2>
+  <div id="gameArea">
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <img id="bird" src="pipit.gif" alt="pipit">
+  </div>
+  <div id="questionPanel">
+    <div id="questionText"></div>
+    <input type="text" id="answerInput" placeholder="Tulis jawaban di sini">
+    <button id="answerBtn" onclick="submitAnswer()">Jawab</button>
+    <div id="feedback"></div>
+  </div>
+  <br>
+  <button id="startBtn" onclick="startGame()">Mulai</button>
+  <button id="restartBtn" onclick="restartGame()" style="display:none">Main Lagi</button>
+
+  <!-- Musik latar -->
+  <audio id="bgMusic" src="musik ulat.mp3" loop></audio>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const bird = document.getElementById("bird");
+    const startBtn = document.getElementById("startBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const questionPanel = document.getElementById("questionPanel");
+    const questionText = document.getElementById("questionText");
+    const answerInput = document.getElementById("answerInput");
+    const feedback = document.getElementById("feedback");
+    const answerBtn = document.getElementById("answerBtn");
+    const bgMusic = document.getElementById("bgMusic");
+
+    const bgBranch = new Image();
+    bgBranch.src = "dahan.jpg";
+
+    const cocoonImg = new Image();
+    cocoonImg.src = "kepompong.png";
+
+    const initialPredatorX = 650;
+    let predatorX = initialPredatorX;
+    const predatorY = 100;
+    const birdWidth = 160;
+    const birdHeight = 100;
+
+    const cocoonX = 250;
+    const cocoonWidth = 80;
+    const cocoonHeight = 45;
+
+    let gameOver = false;
+    let glowPhase = 0;
+
+    const mainQuestions = [
+      { q: "Letak astronomis Indonesia termasuk lokasi ...", a: "Absolut" },
+      { q: "Peraturan atau pedoman disebut ...", a: "Norma" },
+      { q: "Ir.Soekarno dan Moh.Hatta adalah unsur sejarah berupa ...", a: "Manusia" },
+      { q: "Informasi dari simbol dalam peta disebut ...", a: "Legenda" },
+      { q: "Jasa pemadam kebakaran termasuk barang abstrak (Ya/Tidak)?", a: "Ya" },
+      { q: "Penerima pesan komunikasi disebut ...", a: "Komunikan" },
+      { q: "Fosil termasuk sumber sejarah berupa ...", a: "Benda" },
+      { q: "Sumber peta termasuk komponen peta (Ya/Tidak)?", a: "Ya" },
+      { q: "Akulturasi bentuk disosiatif (Ya/Tidak)?", a: "Tidak" },
+      { q: "Pencampuran budaya asing tanpa menghilangkan budaya asli disebut ...", a: "Akulturasi" }
+    ];
+
+    const extraQuestions = [
+      { q: "Gunung Merapi terletak di provinsi ...", a: "Yogyakarta" },
+      { q: "Lambang sila pertama Pancasila adalah ...", a: "Bintang" },
+      { q: "Samudra di sebelah barat Indonesia adalah ...", a: "Hindia" },
+      { q: "Tanggal berapa Indonesia merdeka?", a: "17 Agustus 1945" },
+      { q: "Gunung tertinggi di Indonesia adalah ...", a: "Puncak Jaya" },
+      { q: "Mata uang resmi negara Jepang adalah ...", a: "Yen" },
+      { q: "Suku asli Papua adalah suku ...", a: "Asmat" },
+      { q: "Perdagangan antarnegara disebut perdagangan ...", a: "Internasional" },
+      { q: "Sungai terpanjang di Indonesia adalah Sungai ...", a: "Kapuas" },
+      { q: "Pulau terbesar di Indonesia adalah pulau ...", a: "Kalimantan" }
+    ];
+
+    let correctCount = 0;
+    let phase = 1;
+    let remainingQuestions = [];
+    let currentQuestion = null;
+
+    function drawScene() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(bgBranch, 0, canvas.height/2 - 120, canvas.width, 200);
+
+      const cocoonY = canvas.height/2 - 30;
+      const glow = 15 + 15 * Math.sin(glowPhase);
+      glowPhase += 0.1;
+
+      ctx.save();
+      ctx.shadowColor = "yellow";
+      ctx.shadowBlur = glow;
+      ctx.globalAlpha = 0.7;
+      ctx.drawImage(cocoonImg, cocoonX, cocoonY, cocoonWidth, cocoonHeight);
+      ctx.restore();
+
+      bird.style.left = predatorX + "px";
+    }
+
+    function isColliding() {
+      const cocoonY = canvas.height/2 - 30;
+      return (
+        predatorX < cocoonX + cocoonWidth &&
+        predatorX + birdWidth > cocoonX &&
+        predatorY < cocoonY + cocoonHeight &&
+        predatorY + birdHeight > cocoonY
+      );
+    }
+
+    function birdFlyAway() {
+      bird.src = "pipit terbang.gif";
+      bird.style.transition = "left 2s linear, opacity 2s linear";
+      bird.style.left = "900px";
+      bird.style.opacity = 0;
+    }
+
+    function showVictory() {
+      gameOver = true;
+      birdFlyAway();
+      setTimeout(() => {
+        alert("well done, Kepompong anda selamat!lanjut level 3 ?");
+        restartBtn.style.display = "inline-block";
+        questionPanel.style.display = "none";
+        bgMusic.pause(); // hentikan musik saat game selesai
+      }, 2200);
+    }
+
+    function nextQuestion() {
+      if (gameOver || remainingQuestions.length === 0) {
+        checkPhaseEnd();
+        return;
+      }
+      const index = Math.floor(Math.random() * remainingQuestions.length);
+      currentQuestion = remainingQuestions[index];
+      remainingQuestions.splice(index, 1);
+
+      questionText.textContent = currentQuestion.q;
+      answerInput.value = "";
+      feedback.innerHTML = "";
+      answerBtn.innerText = "Jawab";
+      answerBtn.onclick = submitAnswer;
+      questionPanel.style.display = "block";
+      answerInput.focus();
+    }
+
+    function submitAnswer() {
+      if (!currentQuestion) return;
+      const answer = answerInput.value.trim().toLowerCase();
+      const expected = currentQuestion.a.trim().toLowerCase();
+      if (answer === expected) {
+        correctCount++;
+        feedback.innerHTML = "<img src='checklist.png' alt='Benar' style='width:40px;height:40px'>";
+      } else {
+        predatorX -= 80;
+        if (predatorX < 0) predatorX = 0;
+        feedback.innerHTML = "<img src='x.png' alt='Salah' style='width:40px;height:40px'>";
+      }
+
+      drawScene();
+
+      if (isColliding()) {
+        gameOver = true;
+        setTimeout(() => {
+          alert("Yah, kepompongnya dimakan, anda majikan yang jahat!");
+          restartBtn.style.display = "inline-block";
+          questionPanel.style.display = "none";
+          bgMusic.pause();
+        }, 600);
+        return;
+      }
+
+      answerBtn.innerText = "Lanjut";
+      answerBtn.onclick = nextQuestion;
+    }
+
+    function checkPhaseEnd() {
+      if (phase === 1 && remainingQuestions.length === 0) {
+        if (correctCount >= 7) {
+          showVictory();
+        } else {
+          phase = 2;
+          remainingQuestions = [...extraQuestions];
+          nextQuestion();
+        }
+      } else if (phase === 2 && remainingQuestions.length === 0) {
+        if (correctCount >= 7) {
+          showVictory();
+        } else {
+          gameOver = true;
+          setTimeout(() => {
+            alert("Yah, kepompongnya dimakan, anda majikan yang jahat!");
+            restartBtn.style.display = "inline-block";
+            questionPanel.style.display = "none";
+            bgMusic.pause();
+          }, 600);
+        }
+      }
+    }
+
+    function gameLoop() {
+      if (!gameOver) {
+        drawScene();
+        requestAnimationFrame(gameLoop);
+      }
+    }
+
+    function startGame() {
+      bird.style.display = "block";
+      bird.src = "pipit.gif";
+      bird.style.opacity = 1;
+      bird.style.transition = "left 0.8s ease";
+      predatorX = initialPredatorX;
+      gameOver = false;
+      correctCount = 0;
+      glowPhase = 0;
+      phase = 1;
+      remainingQuestions = [...mainQuestions];
+      startBtn.style.display = "none";
+      restartBtn.style.display = "none";
+      bgMusic.currentTime = 0;
+      bgMusic.play(); // mulai musik
+      gameLoop();
+      setTimeout(nextQuestion, 600);
+    }
+
+    function restartGame() {
+      bird.style.display = "block";
+      bird.src = "pipit.gif";
+      bird.style.opacity = 1;
+      bird.style.transition = "left 0.8s ease";
+      predatorX = initialPredatorX;
+      gameOver = false;
+      correctCount = 0;
+      glowPhase = 0;
+      phase = 1;
+      remainingQuestions = [...mainQuestions];
+      restartBtn.style.display = "none";
+      bgMusic.currentTime = 0;
+      bgMusic.play();
+      gameLoop();
+      setTimeout(nextQuestion, 600);
+    }
+
+    window.onload = function() {
+      drawScene();
+    };
+  </script>
+</body>
+</html>
