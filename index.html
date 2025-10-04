@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Keket Game Intro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { 
+      background:#222; 
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      height:100vh; 
+      margin:0; 
+      font-family:'Comic Neue', cursive; 
+    }
+    #stage { 
+      position:relative; 
+      width:800px; 
+      max-width:100%; 
+      cursor:default; 
+    }
+    #slideImage { 
+      width:100%; 
+      display:block; 
+      border-radius:8px; 
+    }
+
+    /* Kotak dialog */
+    #dialogueBox {
+      position:absolute; 
+      bottom:0; 
+      width:100%;
+      max-height:35%;       /* hanya 35% bagian bawah */
+      overflow-y:auto;      /* scroll kalau teks panjang */
+      background:rgba(0,0,0,0.6); 
+      color:white; 
+      padding:16px; 
+      box-sizing:border-box;
+      line-height:1.6; 
+      font-size:18px;
+      border-radius:12px 12px 0 0; 
+    }
+    #speaker { 
+      font-weight:700; 
+      margin-bottom:12px; 
+      color:#ffcc00; 
+    }
+    #dialogue { 
+      margin:0; 
+      white-space:pre-wrap; 
+      word-spacing:3px; 
+    }
+
+    /* Tombol Start */
+    #startButton {
+      position:absolute; 
+      bottom:50%; 
+      left:50%; 
+      transform:translate(-50%,50%);
+      padding:12px 24px; 
+      font-size:20px; 
+      border:none; 
+      border-radius:8px; 
+      background:#ffcc00; 
+      color:black; 
+      font-weight:bold; 
+      cursor:pointer; 
+      display:none;
+    }
+
+    /* Musik toggle */
+    #musicToggle {
+      position:absolute; 
+      top:10px; 
+      right:10px; 
+      background:rgba(0,0,0,0.6); 
+      color:white; 
+      border:none; 
+      border-radius:50%; 
+      font-size:20px; 
+      cursor:pointer; 
+      width:40px; 
+      height:40px;
+    }
+
+    /* Tombol Skip */
+    #skipBtn {
+      position:absolute; 
+      bottom:10px; 
+      right:10px;
+      background:rgba(0,0,0,0.6); 
+      color:white; 
+      border:none; 
+      border-radius:6px; 
+      font-size:14px; 
+      cursor:pointer; 
+      padding:6px 12px;
+    }
+
+   #nextBtn {
+  position:absolute; 
+  bottom:50px;   /* naikin ke atas tombol Skip */
+  right:10px; 
+  background:none;   /* transparan, kotaknya hilang */
+  color:white;       /* teksnya putih biar kontras */
+  border:none; 
+  font-size:15px;    /* lebih gede */
+  font-weight:bold;
+  cursor:pointer;
+  z-index:10;
+}
+
+
+    /* Title screen */
+    #dialogueBox.title-screen {
+      background:none; 
+      text-align:center; 
+      font-size:48px; 
+      font-weight:bold; 
+      color:#ffcc00;
+      text-shadow:2px 2px 8px rgba(0,0,0,0.7); 
+      position:absolute; 
+      top:50%; 
+      left:50%; 
+      transform:translate(-50%,-50%); 
+      width:auto; 
+      padding:0; 
+      max-height:none;
+      border-radius:0;
+    }
+    #dialogueBox.title-screen #dialogue{ margin:0; }
+
+    /* Responsif untuk HP */
+    @media (max-width: 600px) {
+      #dialogueBox { font-size:4vw; padding:12px; }
+      #nextBtn { font-size:6vw; padding:10px 18px; }
+      #skipBtn { font-size:4vw; padding:8px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="stage" aria-label="Intro stage">
+  <img id="slideImage" src="" alt="slide" />
+  <div id="dialogueBox">
+    <p id="speaker"></p>
+    <p id="dialogue"></p>
+  </div>
+
+  <button id="startButton" onclick="startGame()">Start</button>
+  <button id="musicToggle" aria-label="Toggle music">🎵</button>
+  <button id="nextBtn">>></button>
+  <button id="skipBtn">Skip » End</button>
+</div>
+
+<audio id="bgm" src="musik kepompong.mp3" loop></audio>
+
+<script>
+const slides = [
+  { image:'images/profesor keket.jpg', frames:[ { speaker:'', text:'' } ] },
+  { image:'images/anakketemuulat.png', frames:[ { speaker:'Daniel', text:'Hi little caterpillar, my name is Daniel.\nWould you like to live in my house?' }, { speaker:'Daniel', text:'We will be friends.' } ] },
+  { image:'images/ulat masuk kotak.png', frames:[ { speaker:'Daniel', text:'I will call you, Keket.' }, { speaker:'Narrator', text:'From that day on, Daniel and Keket lived together.' } ] },
+  { image:'images/ulat taro di pot.png', frames:[ { speaker:'Daniel', text:'You will live here...\nI will give you fresh leaves every day to eat.' } ] },
+  { image:'images/saatnya makan.png', frames:[ { speaker:'Narrator', text:'Time to eat......' } ], showStartButton:true }
+];
+
+let currentSlide = 0;
+let currentFrame = 0;
+let typingInterval = null;
+let isTyping = false;
+let musicStarted = false;
+let finishedTyping = false; // <--- tambahan
+
+const stage = document.getElementById('stage');
+const slideImage = document.getElementById('slideImage');
+const speakerEl = document.getElementById('speaker');
+const dialogueEl = document.getElementById('dialogue');
+const dialogueBox = document.getElementById('dialogueBox');
+const startButton = document.getElementById('startButton');
+const skipBtn = document.getElementById('skipBtn');
+const nextBtn = document.getElementById('nextBtn');
+const musicToggle = document.getElementById('musicToggle');
+const bgm = document.getElementById('bgm');
+bgm.volume = 0.5;
+
+/* ---------- render slide ---------- */
+function renderSlide() {
+  const slide = slides[currentSlide];
+  slideImage.src = slide.image;
+
+  const frame = slide.frames[currentFrame];
+  if (frame.speaker === '') {
+    dialogueBox.classList.add('title-screen');
+    speakerEl.innerText = '';
+  } else {
+    dialogueBox.classList.remove('title-screen');
+    speakerEl.innerText = frame.speaker;
+  }
+
+  startTyping(frame.text);
+}
+
+function startTyping(text) {
+  clearInterval(typingInterval);
+  dialogueEl.innerText = '';
+  let i = 0;
+  isTyping = true;
+  finishedTyping = false; // reset setiap mulai ngetik
+  typingInterval = setInterval(() => {
+    if (i >= text.length) {
+      clearInterval(typingInterval);
+      isTyping = false;
+      finishedTyping = true; // tandai sudah selesai
+      return;
+    }
+    dialogueEl.innerText += text[i];
+    i++;
+  }, 40);
+}
+/* ---------- next handler ---------- */
+function handleStageClick() {
+  // kalau masih ngetik → langsung tampil full
+  if (isTyping) {
+    clearInterval(typingInterval);
+    const frame = slides[currentSlide].frames[currentFrame];
+    dialogueEl.innerText = frame.text;
+    isTyping = false;
+    finishedTyping = true; // tandai selesai
+    return;
+  }
+
+  // kalau teks belum selesai → jangan lanjut dulu
+  if (!finishedTyping) {
+    return;
+  }
+
+
+  // Klik pertama di cover → masuk ke slide 1 + musik mulai
+  if (currentSlide === 0) {
+    currentSlide = 1;
+    currentFrame = 0;
+    renderSlide();
+
+    if (!musicStarted) {
+      bgm.play().catch(()=>{});
+      musicStarted = true;
+    }
+    return;
+  }
+
+  // Klik biasa: lanjut frame/slide
+  currentFrame++;
+  if (currentFrame >= slides[currentSlide].frames.length) {
+    if (slides[currentSlide].showStartButton) {
+      startButton.style.display = 'block';
+      return;
+    }
+    currentSlide++;
+    currentFrame = 0;
+    if (currentSlide >= slides.length) {
+      endIntro();
+      return;
+    }
+  }
+  renderSlide();
+}
+
+/* ---------- end & start ---------- */
+function endIntro() {
+  stage.style.display = 'none';
+  startGame();
+}
+function startGame() {
+  bgm.pause(); bgm.currentTime = 0;
+  window.location.href = "start.html";
+}
+
+/* ---------- controls ---------- */
+musicToggle.addEventListener('click', (ev) => {
+  ev.stopPropagation();
+  if (bgm.paused) { bgm.play(); musicToggle.textContent = '🎵'; musicStarted = true; }
+  else { bgm.pause(); musicToggle.textContent = '🔇'; }
+});
+
+skipBtn.addEventListener('click', (ev) => {
+  ev.stopPropagation();
+  currentSlide = slides.length - 1;
+  currentFrame = 0;
+  renderSlide();
+  startButton.style.display = 'block';
+});
+
+nextBtn.addEventListener('click', (ev) => {
+  ev.stopPropagation();
+  handleStageClick();
+});
+
+/* ---------- init ---------- */
+renderSlide();
+</script>
+
+</body>
+</html>

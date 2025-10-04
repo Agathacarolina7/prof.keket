@@ -1,0 +1,773 @@
+ini kodingan saya: 
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <title>KEKET EDUKASI - IPS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+
+/* Modal fullscreen untuk ending */
+.fullscreen-modal {
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fullscreen-video {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;   /* biar pas menutup layar, tidak gepeng */
+}
+
+
+/* Tampilan setelah video selesai */
+.fullscreen-content {
+  width: 100vw;
+  height: 100vh;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
+}
+.fullscreen-content img {
+  max-width: 90vw;
+  max-height: 70vh;
+  width: auto;
+  height: auto;
+  object-fit: contain; /* biar proporsional */
+}
+
+
+.fullscreen-content h2 {
+  margin-top: 15px;
+  font-size: 1.8rem;
+}
+
+.fullscreen-content button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  border: none;
+  background: #4CAF50;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.fullscreen-content button:hover {
+  background: #45a049;
+}
+
+/* Responsif: di layar HP teks dan tombol sedikit lebih kecil */
+@media (max-width: 768px) {
+  .fullscreen-content h2 {
+    font-size: 1.4rem;
+  }
+  .fullscreen-content button {
+    font-size: 1rem;
+    padding: 10px 20px;
+  }
+}
+
+
+   body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #0f1724;
+  color: #fff;
+
+  /* Tambahan untuk HP */
+  overscroll-behavior: none;  /* cegah scroll saat swipe */
+  touch-action: none;         /* matikan gesture default touch */
+}
+
+
+.wrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.panel {
+  width: 300px;
+}
+
+/* Untuk layar kecil (HP) */
+@media (max-width: 700px) {
+  .wrap {
+    flex-direction: column; /* canvas di atas, panel di bawah */
+    align-items: center;
+  }
+  .panel {
+    width: 90%; /* panel melebar sesuai layar HP */
+  }
+}
+
+canvas {
+  width: 100%;       /* canvas melebar sesuai layar */
+  height: auto;      /* tinggi menyesuaikan proporsi */
+  max-width: 600px;  /* tetap maksimal 600px di desktop */
+  background: #071225;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;    /* biar di tengah */
+}
+
+
+    .hud{display:flex;gap:15px;justify-content:space-between;margin-top:8px}
+    .btn{padding:6px 10px;border-radius:6px;cursor:pointer}
+    .btn.primary{background:#16a34a;color:#fff;border:none}
+   .panel{
+  width:90%;          /* bisa menyesuaikan layar HP */
+  max-width:300px;    /* tetap 300px di desktop */
+  padding:12px;
+  background:#071022;
+  border-radius:8px;
+}
+
+    h2{margin-top:0}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10}
+    .modal{background:#0b1220;padding:16px;border-radius:8px;max-width:600px;width:90%}
+    .options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .opt{background:#1e293b;padding:8px;border-radius:6px;cursor:pointer;text-align:center}
+    .opt:hover{background:#334155}
+    .blink { animation: blink 1.5s infinite; }
+    @keyframes blink { 0%,100% {opacity:1;} 50% {opacity:0.5;} }
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px; /* kasih jarak dari Petunjuk */
+  gap: 5px;
+}
+.controls div {
+  display: flex;
+  gap: 20px;
+}
+
+.arrow {
+  width: 70px;
+  height: 70px;
+  font-size: 28px;
+  border-radius: 8px;
+  background: #1e293b;
+  color: white;
+  border: 2px solid #334155;
+  cursor: pointer;
+}
+.arrow:active {
+  background: #16a34a;
+}
+
+  </style>
+</head>
+<body>
+<button onclick="document.getElementById('pipitImage').style.display='block'">Tes Pipit</button>
+
+<!-- Kontrol panah virtual -->
+
+  <div class="wrap">
+    <div>
+      <canvas id="game" width="600" height="600"></canvas>
+
+
+
+
+
+      <div class="hud">
+        <div>Skor: <span id="score">0</span></div>
+        <div>Panjang: <span id="length">3</span></div>
+        <div>Kecepatan: <span id="speedLabel">Normal</span></div>
+      </div>
+    </div>
+    <div class="panel">
+<div class="controls" style="z-index:20; position:relative;">
+  <button class="arrow up">▲</button>
+  <div>
+    <button class="arrow left">◀</button>
+    <button class="arrow right">▶</button>
+  </div>
+  <button class="arrow down">▼</button>
+</div>
+
+      <h2>Petunjuk</h2>
+      <ul>
+        <li>Gerakkan ulat dengan panah / WASD</li>
+        <li>Makan buah → muncul pertanyaan IPS</li>
+        <li>Benar = poin + panjang</li>
+        <li>Salah = ulat melemah 10 detik</li>
+      </ul>
+<div style="text-align:center; margin-top:10px;">
+  <img src="ulat_guru_transparent.png" alt="Ulat Guru" style="width:70%;border-radius:8px;">
+</div>
+    </div>
+  </div>
+
+  <!-- Modal soal -->
+  <div id="questionModal" class="modal-backdrop" style="display:none">
+    <div class="modal">
+      <div id="questionText"></div>
+      <div class="options" id="optionsContainer"></div>
+      <div id="questionStatus" style="margin-top:8px;color:#94a3b8"></div>
+    </div>
+  </div>
+
+  <!-- Suara -->
+  <audio id="successSound" src="success.mp3" preload="auto"></audio>
+  <audio id="gameoverSound" src="gameover.mp3" preload="auto"></audio>
+  <audio id="eatSound" src="pop.mp3" preload="auto"></audio>
+
+<!-- Modal error -->
+<div id="errorPopup" class="modal-backdrop" style="display:none">
+  <div class="modal" style="max-width:400px;text-align:center">
+    <h3 style="color:#f87171;margin:0;">❌ Jawaban Salah</h3>
+    <p>Ulat anda jatuh sakit 🤒</p>
+    <button onclick="closeError()" class="opt" style="margin-top:10px;">OK</button>
+  </div>
+</div>
+
+
+<script>
+let musicStopped = false; // flag supaya musik ulat tidak nyala lagi setelah Next Level
+
+
+const canvas=document.getElementById('game');
+const ctx=canvas.getContext('2d');
+const grid=20,cols=canvas.width/grid,rows=canvas.height/grid;
+let dir,nextDir,fruit,score,baseSpeed,lastMoveTime,isRunning,showingQuestion,slowUntil;
+let snake = [];
+let correctCount, wrongCount;
+const scoreEl=document.getElementById('score');
+const lengthEl=document.getElementById('length');
+const speedLabel=document.getElementById('speedLabel');
+
+const modal=document.getElementById('questionModal');
+const qText=document.getElementById('questionText');
+const optsContainer=document.getElementById('optionsContainer');
+const qStatus=document.getElementById('questionStatus');
+
+// ====== Gambar ======
+const appleImg = new Image();
+appleImg.src = "apel.png";
+const headImg = new Image();
+headImg.src = "kepala_ulat.png";
+const bgImg = new Image();
+bgImg.src = "background.jpg";
+const bodyImg = new Image();
+bodyImg.src = "badan_ulat.png"; // file PNG transparan segmen badan ulat
+
+// ====== Bank soal IPS ======
+const allQuestions=[
+  {q:"Yang dimaksud dengan komunikasi verbal adalah ...",
+   options:["Komunikasi menggunakan kata-kata, lisan atau tulisan","Komunikasi menggunakan gerak tubuh, ekspresi, atau simbol","Komunikasi tanpa adanya lawan bicara","Komunikasi melalui teknologi saja"],correct:0},
+  {q:"Contoh komunikasi nonverbal adalah ...",
+   options:["Mengirim pesan teks","Berbicara lewat telepon","Mengangguk tanda setuju","Membaca buku"],correct:2},
+  {q:"Kontak sosial primer terjadi ketika ...",
+   options:["Interaksi dilakukan melalui media perantara","Interaksi dilakukan tatap muka secara langsung","Interaksi terjadi tanpa komunikasi","Interaksi melalui surat atau pesan singkat"],correct:1},
+  {q:"Contoh kontak sosial sekunder adalah ...",
+   options:["Bertemu teman di kelas","Bercakap-cakap langsung di pasar","Menghubungi guru melalui telepon","Bermain sepak bola bersama"],correct:2},
+  {q:"Interaksi sosial yang bersifat asosiatif adalah ...",
+   options:["Kerja sama","Kompetisi","Pertentangan","Konflik"],correct:0},
+  {q:"Yang termasuk interaksi sosial disosiatif adalah ...",
+   options:["Akomodasi","Kompetisi","Kerja sama","Asimilasi"],correct:1},
+  {q:"Unsur sejarah yang utama adalah ...",
+   options:["Manusia, waktu, dan ruang","Gaya bahasa, estetika, dan seni","Pakaian, makanan, dan rumah","Ideologi, politik, dan ekonomi"],correct:0},
+  {q:"Letak astronomis Indonesia adalah ...",
+   options:["95° BT – 141° BT dan 6° LU – 11° LS","10° BT – 90° BT dan 10° LU – 10° LS","100° BT – 130° BT dan 5° LU – 5° LS","120° BT – 160° BT dan 20° LU – 20° LS"],correct:0},
+  {q:"Komponen utama peta adalah ...",
+   options:["Judul, skala, legenda, simbol, dan gratikul","Judul, warna, harga, dan keterangan","Legenda, gaya bahasa, ilustrasi, dan gambar","Judul, paragraf, teks, dan catatan"],correct:0},
+  {q:"Bentuk interaksi antarwilayah dapat berupa ...",
+   options:["Mobilitas penduduk, perdagangan, transportasi, dan komunikasi","Pertentangan, konflik, dan persaingan","Pertanian, perikanan, dan pertambangan","Pakaian adat, rumah adat, dan makanan tradisional"],correct:0},
+  {q:"Jika jarak pada peta 5 cm mewakili 5 km jarak sebenarnya, maka skala peta tersebut adalah ...",
+   options:["1 : 100.000","1 : 50.000","1 : 500.000","1 : 25.000"],correct:0},
+  {q:"Ibu kota provinsi Kalimantan Tengah adalah ...",
+   options:["Samarinda","Palangka Raya","Pontianak","Tarakan"],correct:1},
+  {q:"Pemerintah membangun jalan tol Trans-Jawa yang menghubungkan berbagai kota besar. Dampak interaksi antarwilayah di bidang transportasi tersebut adalah ...",
+   options:["Meningkatkan kelancaran distribusi barang dan mobilitas penduduk","Membatasi pergerakan masyarakat antar daerah","Mengurangi kerja sama antarwilayah karena akses semakin mudah","Menyebabkan berkurangnya aktivitas perdagangan antarwilayah"],correct:0},
+  {q:"Yang termasuk kebutuhan tersier adalah ...",
+   options:["Makanan pokok seperti nasi dan sayur","Rumah tempat tinggal sederhana","Mobil mewah dan perhiasan emas","Pakaian sehari-hari"],correct:2},
+  {q:"Menabung untuk biaya pendidikan anak termasuk contoh ...",
+   options:["Kebutuhan sekarang","Kebutuhan yang akan datang","Kebutuhan primer","Kebutuhan tersier"],correct:1},
+  {q:"Di suatu daerah harga bensin naik secara signifikan. Dampak yang kemungkinan terjadi terhadap penjualan sepeda motor adalah ...",
+   options:["Penjualan sepeda motor meningkat karena masyarakat ingin lebih cepat","Penjualan sepeda motor menurun karena biaya operasional bertambah","Penjualan sepeda motor tetap sama karena tidak ada kaitan dengan bensin","Penjualan sepeda motor naik turun secara acak tanpa pengaruh bensin"],correct:1},
+  {q:"Yang termasuk norma kesusilaan adalah ...",
+   options:["Tidak menyontek saat ujian","Tidak membuang sampah sembarangan","Menghormati bendera saat upacara","Membayar pajak tepat waktu"],correct:0},
+  {q:"Benda peninggalan sejarah berupa artefak adalah ...",
+   options:["Cerita rakyat tentang asal-usul suatu daerah","Prasasti dan peralatan dari logam","Kebiasaan masyarakat dalam upacara adat","Peristiwa penting yang diceritakan ulang"],correct:1},
+  {q:"Yang termasuk sumber sejarah tertulis adalah ...",
+   options:["Tradisi lisan yang diceritakan turun-temurun","Sisa bangunan candi dan arca","Naskah kuno dan dokumen perjanjian","Alat rumah tangga dari zaman prasejarah"],correct:2},
+  {q:"Zona Ekonomi Eksklusif (ZEE) Indonesia ditetapkan sejauh ...",
+   options:["12 mil laut dari garis pangkal","200 mil laut dari garis pangkal","100 mil laut dari garis pangkal","350 mil laut dari garis pangkal"],correct:1}
+];
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+let questionPool = shuffle([...allQuestions]);
+
+function resetGame(){
+  questionPool = shuffle([...allQuestions]);
+  snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+  dir={x:1,y:0};nextDir={x:1,y:0};
+  score=0;baseSpeed=4;lastMoveTime=0;isRunning=true;showingQuestion=false;slowUntil=0;
+  correctCount=0; wrongCount=0;
+  placeFruit();updateHUD();requestAnimationFrame(loop);
+}
+function updateHUD(){scoreEl.textContent=score;lengthEl.textContent=snake.length;
+  speedLabel.textContent=(Date.now()<slowUntil?"Melemah":"Normal");}
+function placeFruit(){
+  let fx, fy;
+  do {
+    fx = Math.floor(Math.random() * cols);
+    fy = Math.floor(Math.random() * rows);
+  } while (snake && snake.some(s => s.x === fx && s.y === fy));  
+  fruit = {x: fx, y: fy};
+}
+
+function nextLevel() 
+{
+  baseSpeed += 2;  // tambah kecepatan ulat
+
+  questionPool = shuffle([...allQuestions]); // reset soal
+  snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+  dir={x:1,y:0}; nextDir={x:1,y:0};
+  score=0; lastMoveTime=0; isRunning=true; showingQuestion=false; slowUntil=0;
+  correctCount=0; wrongCount=0;
+  placeFruit(); updateHUD();
+  modal.style.display="none";
+  requestAnimationFrame(loop);
+}
+
+
+
+// ====== Fungsi draw dengan glow ======
+function draw(){
+  // background
+  if (bgImg.complete) ctx.drawImage(bgImg,0,0,canvas.width,canvas.height);
+  else {ctx.fillStyle="#071225"; ctx.fillRect(0,0,canvas.width,canvas.height);}
+
+ // apel
+if (fruit) {
+  let appleSize = grid * 1.7; // bikin apel lebih besar
+
+if (appleImg.complete) {
+  ctx.shadowBlur = 15;
+  ctx.shadowColor = "#90ee90";
+
+  let appleW = grid * 2.2; // lebar apel
+  let aspect = appleImg.height / appleImg.width;
+  let appleH = appleW * aspect; // tinggi sesuai rasio asli
+
+  ctx.drawImage(
+    appleImg,
+    fruit.x * grid + (grid - appleW) / 2,
+    fruit.y * grid + (grid - appleH) / 2,
+    appleW,
+    appleH
+  );
+
+  ctx.shadowBlur = 0;
+}
+}
+
+  // ulat
+  snake.forEach((s,i)=>{
+     if (i === 0) {
+      // === KEPALA ===
+     let angle = 0; // offset karena default gambar hadap ke bawah
+if (dir.x === 0 && dir.y === -1) angle = 0;             // atas
+if (dir.x === 1 && dir.y === 0) angle = Math.PI / 2;    // kanan
+if (dir.x === 0 && dir.y === 1) angle = Math.PI;        // bawah
+if (dir.x === -1 && dir.y === 0) angle = -Math.PI / 2;  // kiri
+      let headSize = grid * 2; // kepala lebih besar dari badan
+
+      ctx.save();
+      ctx.translate(s.x * grid + grid / 2, s.y * grid + grid / 2);
+      ctx.rotate(angle);
+
+      if (headImg && headImg.complete) {
+        ctx.drawImage(headImg, -headSize / 2, -headSize / 2, headSize, headSize);
+      } else {
+        // fallback lingkaran hijau
+        ctx.fillStyle = "green";
+        ctx.beginPath();
+        ctx.arc(0, 0, headSize / 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+   } else {
+      // ==== BADAN ====
+      let bodySize = grid * 2;
+
+      if (bodyImg.complete) {
+        ctx.drawImage(
+          bodyImg,
+          s.x * grid + (grid - bodySize) / 2,
+          s.y * grid + (grid - bodySize) / 2,
+          bodySize,
+          bodySize
+        );
+      } else {
+        ctx.fillStyle = "limegreen";
+        ctx.beginPath();
+        ctx.arc(s.x * grid + grid / 2, s.y * grid + grid / 2, bodySize / 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+});
+}
+
+// ====== Game loop & soal ======
+function loop(ts){
+  if(!isRunning) return;
+  let eff=baseSpeed;
+  if(Date.now()<slowUntil) eff=0.5;
+  let step=1000/eff;
+  if(ts-lastMoveTime>=step){
+    lastMoveTime=ts; dir=nextDir;
+    let head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+    if(head.x<0||head.x>=cols||head.y<0||head.y>=rows||snake.some(s=>s.x===head.x&&s.y===head.y)){
+      gameOver(); return;
+    }
+    snake.unshift(head);
+    if(fruit && head.x===fruit.x && head.y===fruit.y){
+      document.getElementById("eatSound").play();
+      isRunning=false; showingQuestion=true; showQuestion();
+    } else snake.pop();
+  }
+  draw();
+  if(isRunning) requestAnimationFrame(loop);
+}
+function gameOver(){
+  isRunning=false; showingQuestion=false;
+  document.getElementById("gameoverSound").play();
+  qText.innerHTML=`
+    <h2 style="text-align:center;margin:0;">Game Over</h2>
+    <p style="text-align:center;">Skor akhir: ${score}</p>
+    <p style="text-align:center;">Jawaban benar: ${correctCount}</p>
+    <p style="text-align:center;">Jawaban salah: ${wrongCount}</p>
+  `;
+  optsContainer.innerHTML='<button onclick="modal.style.display=\'none\';resetGame();" class="opt">Mulai Lagi</button>';
+  qStatus.textContent=""; modal.style.display="flex";
+}
+function getFinalMessage(score){
+  if(score>=150) return '<h2 class="blink" style="text-align:center;font-size:24px;color:#4ade80;margin:0;">ULAT ANDA SEHAT ✅<br><span style="font-size:18px;">Anda majikan ulat yang baik</span></h2>';
+  else if(score>=120) return '<h2 class="blink" style="text-align:center;font-size:24px;color:#facc15;margin:0;">ULAT ANDA KURANG GIZI 🍌</h2>';
+  else return '<h2 class="blink" style="text-align:center;font-size:24px;color:#f87171;margin:0;">ULAT ANDA MAU MATI ❌<br><span style="font-size:18px;">Anda majikan yang buruk</span></h2>';
+}
+function getRandomQ(){
+  if(questionPool.length===0){
+    isRunning=false; showingQuestion=false;
+    document.getElementById("successSound").play();
+    qText.innerHTML=`${getFinalMessage(score)}
+      <p style="text-align:center;margin-top:12px;font-size:18px;">Skor akhir: ${score}</p>
+      <p style="text-align:center;">Jawaban benar: ${correctCount}</p>
+      <p style="text-align:center;">Jawaban salah: ${wrongCount}</p>`;
+    
+    optsContainer.innerHTML = `
+  <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+    <button onclick="modal.style.display='none'; resetGame();" class="opt">Main Lagi</button>
+    <button id="nextLevelBtn" class="opt">Next Level ➡️</button>
+  </div>
+`;
+
+// logika tombol Next Level
+const nextBtn = document.getElementById("nextLevelBtn");
+if (score >= 150) {
+  nextBtn.onclick = () => { 
+    // mulai musik kepompong
+    const kepompongMusic = new Audio("musik kepompong.mp3");
+    kepompongMusic.play().catch(err => console.log("Autoplay kepompong diblokir:", err));
+
+    // lanjut ke video & overlay pipit
+    showVictory(); 
+  };
+} else {
+  nextBtn.disabled = true;
+  nextBtn.style.opacity = "0.5";
+  nextBtn.style.cursor = "not-allowed";
+}
+
+
+    qStatus.textContent=""; 
+    modal.style.display="flex"; 
+    return null;
+  }
+  const idx=Math.floor(Math.random()*questionPool.length);
+  const q=questionPool[idx]; 
+  questionPool.splice(idx,1); 
+  return q;
+}
+
+function showQuestion(){
+  currentQ=getRandomQ(); if(!currentQ) return;
+  qText.textContent=currentQ.q; optsContainer.innerHTML="";
+  currentQ.options.forEach((o,i)=>{
+    let b=document.createElement("div");
+    b.className="opt";
+    b.textContent=String.fromCharCode(65+i)+". "+o;
+    b.onclick=()=>answer(i);
+    optsContainer.appendChild(b);
+  });
+  qStatus.textContent="Pilih jawaban"; modal.style.display="flex";
+}
+function answer(i){
+  if(i===currentQ.correct){
+    qStatus.textContent="Benar! +10 poin"; correctCount++;
+    for(let j=0;j<3;j++){let t=snake[snake.length-1];snake.push({x:t.x,y:t.y});}
+    score+=10; placeFruit();
+  } else { 
+  qStatus.textContent="Jawaban salah, ulat anda sakit 🐛🤒 (melemah 10 detik)"; 
+  wrongCount++; 
+  slowUntil=Date.now()+10000; 
+  placeFruit();
+ showErrorPopup(); // <--- TAMBAHKAN INI
+}
+  updateHUD();
+  setTimeout(()=>{modal.style.display="none"; isRunning=true; showingQuestion=false; requestAnimationFrame(loop);},800);
+}
+window.addEventListener("keydown",e=>{
+  if(e.key==="ArrowLeft"||e.key==="a") if(dir.x!==1) nextDir={x:-1,y:0};
+  if(e.key==="ArrowRight"||e.key==="d") if(dir.x!==-1) nextDir={x:1,y:0};
+  if(e.key==="ArrowUp"||e.key==="w") if(dir.y!==1) nextDir={x:0,y:-1};
+  if(e.key==="ArrowDown"||e.key==="s") if(dir.y!==-1) nextDir={x:0,y:1};
+});
+
+placeFruit();draw();updateHUD();
+
+function showErrorPopup(){
+  document.getElementById("errorPopup").style.display = "flex";
+}
+function closeError(){
+  document.getElementById("errorPopup").style.display = "none";
+}
+
+function stepSnake() {
+  dir = nextDir;
+  let head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+
+  // cek tabrakan
+  if (
+    head.x < 0 || head.x >= cols ||
+    head.y < 0 || head.y >= rows ||
+    snake.some(s => s.x === head.x && s.y === head.y)
+  ) {
+    gameOver();
+    return;
+  }
+
+  snake.unshift(head);
+
+  if (fruit && head.x === fruit.x && head.y === fruit.y) {
+    document.getElementById("eatSound").play();
+    isRunning = false; 
+    showingQuestion = true;
+    showQuestion();
+  } else {
+    snake.pop();
+  }
+
+  draw();
+  updateHUD();
+}
+
+function loop(ts){
+  if(!isRunning) return;
+  let eff = (Date.now() < slowUntil ? 0.5 : baseSpeed);
+  let step = 1000/eff;
+  if(ts - lastMoveTime >= step){
+    lastMoveTime = ts;
+    stepSnake();  // pakai fungsi yang sama
+  }
+  if(isRunning) requestAnimationFrame(loop);
+}
+
+function setDirection(x, y) {
+  // jangan boleh langsung berbalik arah
+  if ((x !== 0 && dir.x === -x) || (y !== 0 && dir.y === -y)) {
+    return;
+  }
+  nextDir = {x, y};
+  moveImmediate(); // langsung belok + maju 1 kotak
+}
+
+
+function moveImmediate() {
+  // hanya jalan kalau game sedang running
+  if (!isRunning || showingQuestion) return;
+
+  dir = nextDir;
+  let head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+
+  // cek tabrakan
+  if (
+    head.x < 0 || head.x >= cols ||
+    head.y < 0 || head.y >= rows ||
+    snake.some(s => s.x === head.x && s.y === head.y)
+  ) {
+    gameOver();
+    return;
+  }
+
+  snake.unshift(head);
+
+  if (fruit && head.x === fruit.x && head.y === fruit.y) {
+    document.getElementById("eatSound").play();
+    isRunning = false; 
+    showingQuestion = true;
+    showQuestion();
+  } else {
+    snake.pop();
+  }
+
+  draw();
+  updateHUD();
+}
+
+
+
+function bindArrowControls() {
+  const up = document.querySelector(".arrow.up");
+  const down = document.querySelector(".arrow.down");
+  const left = document.querySelector(".arrow.left");
+  const right = document.querySelector(".arrow.right");
+
+  const handlers = [
+    [up, 0, -1],
+    [down, 0, 1],
+    [left, -1, 0],
+    [right, 1, 0]
+  ];
+
+  handlers.forEach(([btn, x, y]) => {
+    // klik biasa (desktop)
+// Kalau autoplay diblokir browser, musik jalan setelah ada interaksi user
+document.addEventListener("click", () => {
+  if (!musicStopped && bgMusic.paused) {
+    bgMusic.play();
+  }
+});
+
+
+btn.addEventListener("touchstart", e => { 
+  e.preventDefault(); 
+  setDirection(x, y); 
+  if (!musicStopped && bgMusic.paused) bgMusic.play(); 
+});
+
+  });
+}
+
+bindArrowControls();
+resetGame(); // langsung mulai game saat halaman terbuka
+</script>
+
+<!-- Lagu Pengiring -->
+<audio id="bgMusic" src="musik ulat.mp3" loop autoplay></audio>
+
+<!-- letakkan hanya SATU kali di akhir body -->
+<!-- Video ending (cuma sekali di akhir body) -->
+<video id="endingVideo" 
+  style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);
+         width:90%; max-width:900px; height:auto; z-index:9999; border:4px solid #fff; border-radius:12px; background:#000;" 
+  preload="auto" playsinline>
+  <source src="video-ending.mp4" type="video/mp4">
+  Browser kamu tidak mendukung video.
+</video>
+
+<img id="pipitImage" src="burung-pipit.png" alt="Burung Pipit" 
+     style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);
+            width:70%; max-width:500px; height:auto; z-index:9999;">
+
+<!-- Overlay untuk teks + tombol di atas pipit -->
+<div id="pipitOverlay" 
+     style="display:none; position:fixed; inset:0; z-index:10000; 
+            flex-direction:column; align-items:center; justify-content:center; 
+            color:white; font-family:sans-serif; text-align:center;">
+
+  
+  <h2 style="font-size:2em; margin-bottom:20px;">Protect the Cocoon from Birds</h2>
+  
+  <button onclick="goToLevel2()" 
+          style="padding:12px 24px; font-size:1.2em; border:none; border-radius:8px; 
+                 background:#4CAF50; color:white; cursor:pointer;">
+    Start
+  </button>
+</div>
+
+
+
+<!-- Overlay gelap -->
+<div id="overlay" 
+     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); 
+            z-index:9998;"></div>
+
+<!-- Musik kepompong, di HTML -->
+<audio id="cocoonMusic" src="kepompong.mp3" preload="auto"></audio>
+
+<script>
+function showVictory() {
+  const video = document.getElementById("endingVideo");
+  const overlay = document.getElementById("overlay");
+  const pipitImage = document.getElementById("pipitImage");
+  const cocoonMusic = document.getElementById("cocoonMusic");
+  const bgMusic = document.getElementById("bgMusic");
+
+  // stop musik ulat
+  if (bgMusic && !bgMusic.paused) {
+    bgMusic.pause();
+    musicStopped = true;
+  }
+
+  // tampilkan overlay gelap langsung
+  overlay.style.display = "block";
+
+  // putar musik kepompong langsung (klik dianggap interaksi)
+  cocoonMusic.currentTime = 0;
+  cocoonMusic.loop = false;
+  cocoonMusic.play().catch(err => console.log("Autoplay diblokir:", err));
+
+  // delay 3 detik sebelum video mulai
+  setTimeout(() => {
+    video.style.display = "block";
+    video.currentTime = 0;
+    video.play().catch(err => console.log("Autoplay diblokir:", err));
+
+    // setelah video habis → munculkan pipit + overlay teks
+    video.onended = () => {
+      video.style.display = "none";
+      pipitImage.style.display = "block";
+      document.getElementById("pipitOverlay").style.display = "flex";
+    };
+  }, 3000); // delay 3 detik
+}
+
+// fungsi global untuk pindah level 
+function goToLevel2() {
+ window.location.href = "level2/index.html"; 
+}
+</script>
+
+
+
+
+</body>
+</html>
+
