@@ -286,17 +286,47 @@ bgImg.onload = checkImagesLoaded;
 
 // ====== Bank soal IPS ======
 const allQuestions=[
-  {q:"Yang dimaksud dengan komunikasi verbal adalah ...",
-   options:["Komunikasi menggunakan kata-kata, lisan atau tulisan","Komunikasi menggunakan gerak tubuh, ekspresi, atau simbol","Komunikasi tanpa adanya lawan bicara","Komunikasi melalui teknologi saja"],correct:0},
-  {q:"Contoh komunikasi nonverbal adalah ...",
-   options:["Mengirim pesan teks","Berbicara lewat telepon","Mengangguk tanda setuju","Membaca buku"],correct:2},
-  {q:"Kontak sosial primer terjadi ketika ...",
-   options:["Interaksi dilakukan melalui media perantara","Interaksi dilakukan tatap muka secara langsung","Interaksi terjadi tanpa komunikasi","Interaksi melalui surat atau pesan singkat"],correct:1},
-  {q:"Contoh kontak sosial sekunder adalah ...",
-   options:["Bertemu teman di kelas","Bercakap-cakap langsung di pasar","Menghubungi guru melalui telepon","Bermain sepak bola bersama"],correct:2},
-  {q:"Interaksi sosial yang bersifat asosiatif adalah ...",
-   options:["Kerja sama","Kompetisi","Pertentangan","Konflik"],correct:0},
- 
+  {q:"Tumbuhan yang termasuk golongan hutan Mangrove adalah ...",
+   options:["Pohon jati","Pohon karet","Pohon bakau","Pohon toge"],correct:2},
+  {q:"Yang bukan merupakan ciri-ciri hutan produksi, adalah ...",
+   options:["Pohon-pohon bersifat homogen","bermacam-macam pohon di dalamnya","fungsi pokok untuk kegiatan produksi","digunakan sebagai bahan baku"],correct:1},
+  {q:"Apa yang terjadi jika hutan produksi di tebang? ...",
+   options:["terjadi erosi","Banjir bandang","ekosistem terganggu","tanah menjadi subur"],correct:3},
+  {q:"Undang-undang yang mengatur tentang pertambangan ...",
+   options:["UU No.11 tahun 1967","UU No.12 tahun 1969","UU No.22 tahun 2008","UU No.30 tahun 2013"],correct:0},
+  {q:"Kegiatan pencarian dan penyelidikan awal dalam tahap pertambangan disebut  ...",
+   options:["Evaluasi","Prospeksi","Reklamasi","Eksploitasi"],correct:1},
+   {q:"Tahap dalam pertambangan yang harus dilakukan untuk memulihkan bekas galian adalah tahap ...",
+   options:["Reklamasi","Prospeksi","Eksploitasi","Pengelolaan"],correct:0},
+   {q:"Yang termasuk tambang golongan A ...",
+   options:["Emas","Pasir","Tembaga","Minyak bumi"],correct:3},
+   {q:"Indonesia memiliki potensi sumber daya laut yang besar yang dapat dikelola diantaranya, kecuali ...",
+   options:["Mangrove","Perikanan","Wisata bahari","Batu bara"],correct:3},
+ {q:"Berikut ini pertambangan yang menghasilkan energi, kecuali ...",
+   options:["Minyak bumi","Pasir","Gas alam","Batu bara"],correct:1},
+  {q:"Energi kelautan dapat dimanfaatkan sebagai ...",
+   options:["Pembangkit listrik","Pembuatan terumbu karang","Pembuatan pagar laut","Penunjuk arah bagi nelayan"],correct:0},
+
+  {q:"Kerajaan Hindu Budha yang berhasil menyatukan Nusantara ...",
+   options:["Kutai","Majapahit","Mataram kuno","Sriwijaya"],correct:1},
+  {q:"Mahapatih yang terkenal dengan sumpah palapa adalah ...",
+   options:["Hayam wuruk","Raden Patah","Gajah Mada","Raden Wijaya"],correct:2},
+  {q:"Kerajaan Hindu Budha pertama di Indonesia ...",
+   options:["Majapahit","Tarumanegara","Kutai Martadipura","Kutai kartanegara"],correct:2},
+  {q:"Ken Arok ingin merebut kekuasaan tumapel(kediri) dan terpikat dengan istri tunggul ametung bernama...",
+   options:["Ken dedes","Ken Umang","Wurawari","Gayatri"],correct:0},
+  {q:"Kerajaan Sriwijaya dikenal sebagai kerajaan Maritim karena menguasai jalur perdagangan di wilayah...",
+   options:["Karimata","Selat jawa","Selat malaka","Jawa timur"],correct:2},
+   {q:"Candi Borobudur dan candi prambanan merupakan peninggalan kerajaan....",
+   options:["Kutai","Majapahit","Mataram kuno","Sriwijaya"],correct:2},
+  {q:"Kerajaan Demak merupakan kerajaan Islam pertama di Pulau Jawa yang didirikan oleh....",
+   options:["Sultan Malik Al-Saleh","Mulawarman","Hayam wuruk","Raden wijaya"],correct:3},
+   {q:"Jumlah wali sanga ada berapa orang?....",
+   options:["6","7","8","9"],correct:3},
+   {q:"Kerajaan dimana ratunya memiliki keadilan, ketegasan dalam hukum adalah....",
+   options:["Kalingga","Kutai","Singasari","Kediri"],correct:0},
+    {q:"Indonesia menjual produk dalam negeri ke Thailand merupakan kegiatan Perdagangan Internasional berupa....",
+   options:["perdagangan domestik","Ekspor","Impor","Barter dalam negeri"],correct:1},
 ];
 
 function shuffle(array) {
@@ -551,9 +581,9 @@ function showQuestion(){
 }
 function answer(i){
   if(i===currentQ.correct){
-    qStatus.textContent="Benar! +40 poin"; correctCount++;
+    qStatus.textContent="Benar! +10 poin"; correctCount++;
     for(let j=0;j<3;j++){let t=snake[snake.length-1];snake.push({x:t.x,y:t.y});}
-    score+=40; placeFruit();
+    score+=10; placeFruit();
   } else { 
   qStatus.textContent="Jawaban salah, ulat anda sakit 🐛🤒 (melemah 10 detik)"; 
   wrongCount++; 
@@ -802,6 +832,7 @@ document.addEventListener("click", () => {
 
 </body>
 </html>
+
 
 
 
